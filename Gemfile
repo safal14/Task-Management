@@ -5,7 +5,7 @@ gem "rails", "~> 8.1.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+# gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -18,6 +18,8 @@ gem "stimulus-rails"
 gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+# postgres
+gem 'pg', '~> 1.6', '>= 1.6.2'
 # devise gem
 gem 'devise', '~> 4.9', '>= 4.9.4'
 # pundit
