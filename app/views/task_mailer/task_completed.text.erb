@@ -1,0 +1,3 @@
+<h1>Task Completed</h1>
+<p>The task "<%= @task.title %>" has been marked as completed by <%= @completed_by.first_name %>.</p>
+<p>View details: <%= link_to "View Task", task_url(@task, host: "localhost:3000") %></p>
