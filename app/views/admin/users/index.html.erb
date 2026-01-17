@@ -1,0 +1,30 @@
+<h1>Admin – User Management</h1>
+
+<% if @users.any? %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |u| %>
+        <tr>
+          <td><%= u.first_name %> <%= u.last_name %></td>
+          <td><%= u.email %></td>
+          <td>
+            <span class="badge bg-<%= u.admin? ? 'danger' : u.manager? ? 'warning' : 'secondary' %>">
+              <%= u.role.upcase %>
+            </span>
+          </td>
+          <td><%= u.created_at.strftime("%b %d, %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No users yet.</p>
+<% end %>
