@@ -1,0 +1,19 @@
+<h1>Dashboard</h1>
+
+<p class="lead"><%= @greeting %></p>
+
+<% if current_user.admin? %>
+  <p>You are <strong>ADMIN</strong> → full access</p>
+<% elsif current_user.manager? %>
+  <p>You are <strong>MANAGER</strong> → can create tasks</p>
+<% else %>
+  <p>You are <strong>MEMBER</strong> → you can only see your tasks</p>
+<% end %>
+
+<hr>
+
+<%= button_to "Sign out",
+              destroy_user_session_path,
+              method: :delete,
+              data: { turbo_confirm: "Are you sure you want to sign out?" },
+              class: "btn btn-danger mt-3" %>
