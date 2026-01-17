@@ -5,3 +5,4 @@ class DashboardController < ApplicationController
     # Temporary – just to see something
     @greeting = "Hello #{current_user.first_name}!"
   end
+end
