@@ -1,8 +1,13 @@
+# app/mailers/task_mailer.rb
 class TaskMailer < ApplicationMailer
-  def task_assigned(task)
-    @task = task
-    @assigned_user = task.assigned_to
-    @creator = task.creator
+  default from: "no-reply@taskapp.com"
+
+  # ------------------- New Task Assigned -------------------
+  def assigned_email
+    @task = params[:task]
+    return unless @task.assigned_to.present?
+
+    @assigned_user = @task.assigned_to
 
     mail(
       to: @assigned_user.email,
@@ -10,10 +15,26 @@ class TaskMailer < ApplicationMailer
     )
   end
 
-  def task_completed(task)
-    @task = task
-    @creator = task.creator
-    @completed_by = task.assigned_to  # or whoever marked it done
+  # ------------------- Task Updated -------------------
+  def update_email
+    @task = params[:task]
+    return unless @task.creator.present?
+
+    @creator = @task.creator
+
+    mail(
+      to: @creator.email,
+      subject: "Update on Task: #{@task.title}"
+    )
+  end
+
+  # ------------------- Task Completed -------------------
+  def completed_email
+    @task = params[:task]
+    @completed_by = params[:completed_by]
+    return unless @task.creator.present?
+
+    @creator = @task.creator
 
     mail(
       to: @creator.email,

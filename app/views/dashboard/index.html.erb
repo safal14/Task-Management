@@ -11,7 +11,9 @@
 <% end %>
 
 <hr>
-
+<% if current_user.manager? %>
+  <%= link_to "Create New Task", new_task_path, class: "btn btn-primary" %>
+<% end %>
 <%= button_to "Sign out",
               destroy_user_session_path,
               method: :delete,

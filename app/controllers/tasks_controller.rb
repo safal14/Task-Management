@@ -1,99 +1,97 @@
-# app/controllers/tasks_controller.rb
 class TasksController < ApplicationController
   include Pundit::Authorization
 
   before_action :authenticate_user!
   before_action :set_task, only: [:show, :edit, :update, :destroy, :mark_complete]
 
-  def index
-    # Different users see different sets of tasks
-    if current_user.admin?
-      @tasks = Task.all.order(created_at: :desc)
-    elsif current_user.manager?
-      # Managers see tasks they created + tasks assigned to their team members
-      @tasks = Task.where(creator: current_user)
-                   .or(Task.where(assigned_to: current_user.team_members))
-                   .order(created_at: :desc)
-    else
-      # Members only see tasks assigned to them
-      @tasks = current_user.assigned_tasks.order(created_at: :desc)
-    end
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
-    @tasks = @tasks.page(params[:page]).per(10) if defined?(Kaminari) # optional pagination
+  # ---------- INDEX ----------
+  def index
+    @tasks = policy_scope(Task).order(created_at: :desc)
   end
 
+  # ---------- SHOW ----------
   def show
     authorize @task
   end
 
+  # ---------- NEW ----------
   def new
     @task = Task.new
+    @members = User.member
     authorize @task
   end
 
-  def create
-    @task = current_user.created_tasks.build(task_params)
-    authorize @task
+  # ---------- CREATE ----------
+def create
+  @task = Task.new(task_params)
+  @task.creator = current_user
+  authorize @task
 
-    if @task.save
-      if @task.assigned_to.present?
-        TaskMailer.with(task: @task).task_assigned.deliver_later
-        flash[:notice] = "Task created and email notification sent to #{@task.assigned_to.full_name}."
-      else
-        flash[:notice] = "Task created successfully."
-      end
-      redirect_to @task
+  if @task.save
+    if @task.assigned_to.present?
+      TaskMailer.with(task: @task).assigned_email.deliver_later
+      redirect_to @task, notice: "Task created and assigned successfully."
     else
-      flash.now[:alert] = "Could not create task."
-      render :new, status: :unprocessable_entity
+      redirect_to @task, notice: "Task created successfully."
     end
+  else
+    @members = User.member
+    render :new, status: :unprocessable_entity
   end
+end
 
+
+  # ---------- EDIT ----------
   def edit
+    @members = User.member
     authorize @task
   end
 
+  # ---------- UPDATE ----------
   def update
     authorize @task
 
+    assignee_changed = @task.assigned_to_id != task_params[:assigned_to_id].to_i
+
     if @task.update(task_params)
-      # Send notification only if assignee actually changed and new assignee exists
-      if @task.assigned_to_id_previously_changed? && @task.assigned_to.present?
-        TaskMailer.with(task: @task).task_assigned.deliver_later
-        flash[:notice] = "Task updated and reassignment email sent."
+      if assignee_changed && @task.assigned_to.present?
+        TaskMailer.assigned_email(@task).deliver_later
+        notice = "Task updated and reassigned."
       else
-        flash[:notice] = "Task updated successfully."
+        notice = "Task updated successfully."
       end
-      redirect_to @task
+      redirect_to @task, notice: notice
     else
-      flash.now[:alert] = "Could not update task."
+      @members = User.member
       render :edit, status: :unprocessable_entity
     end
   end
 
+  # ---------- DESTROY ----------
   def destroy
     authorize @task
     @task.destroy
-    flash[:notice] = "Task was successfully deleted."
-    redirect_to tasks_path
+    redirect_to tasks_path, notice: "Task deleted successfully."
   end
 
-  # Custom action: mark task as completed
-  def mark_complete
-    authorize @task, :mark_complete?
+  # ---------- MARK COMPLETE ----------
+def mark_complete
+  authorize @task, :mark_complete?
 
-    if @task.update(status: :completed)
-      # Notify creator if they are not the one who completed it
-      if @task.creator.present? && @task.creator != current_user
-        TaskMailer.with(task: @task).task_completed.deliver_later
-      end
-      flash[:notice] = "Task marked as completed."
-    else
-      flash[:alert] = "Could not mark task as completed."
+  if @task.update(status: :completed)
+    # Send email to creator if current user is not the creator
+    if @task.creator != current_user
+      TaskMailer.with(task: @task, completed_by: current_user).completed_email.deliver_later
     end
-
-    redirect_to @task
+    redirect_to @task, notice: "Task marked as completed."
+  else
+    redirect_to @task, alert: "Could not complete task."
   end
+end
+
 
   private
 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <title>New Task Assigned</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; color: #212529;">
+
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+
+      <h2 style="color: #0d6efd; text-align: center;">New Task Assigned to You</h2>
+
+      <p>Hello <strong><%= @task.assigned_to.first_name %></strong>,</p>
+
+      <p>You have been assigned a new task in Task Manager:</p>
+
+      <ul style="padding-left: 20px;">
+        <li><strong>Title:</strong> <%= @task.title %></li>
+        <li><strong>Description:</strong> <%= @task.description %></li>
+        <li><strong>Due Date:</strong> <%= @task.due_date.strftime("%B %d, %Y") %></li>
+      </ul>
+
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="<%= task_url(@task) %>" 
+           style="display: inline-block; padding: 12px 25px; background-color: #0d6efd; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+          View Task & Update
+        </a>
+      </p>
+
+      <p>Thanks,<br><em>Task Manager Team</em></p>
+
+    </div>
+
+  </body>
+</html>
