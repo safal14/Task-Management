@@ -34,6 +34,9 @@
       <p><strong>Assigned To:</strong>
         <%= @task.assigned_to&.first_name || "N/A" %>
       </p>
+              <strong>Assigned By:</strong>
+        <%= @task.creator ? @task.creator.full_name : "Unknown" %>
+      </p>
 
       <!-- Action Buttons (Edit / Mark Complete) -->
       <% if current_user == @task.assigned_to && @task.pending? %>
