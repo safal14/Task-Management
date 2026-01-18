@@ -6,22 +6,26 @@ class TaskPolicy < ApplicationPolicy
       elsif user.admin?
         scope.all
       elsif user.manager?
-        # For now: only own created tasks (we improve later)
+        # Managers see tasks they created
         scope.where(creator: user)
       else # member
+        # Members see tasks assigned to them
         scope.where(assigned_to: user)
       end
     end
   end
 
+  # Everyone can see their own tasks / tasks they are allowed to see
   def index?
-    true   # everyone can see their own dashboard/tasks
+    true
   end
 
+  # Show task if admin, creator, or assignee
   def show?
     user.admin? || record.creator == user || record.assigned_to == user
   end
 
+  # Only admin or manager can create tasks
   def create?
     user.admin? || user.manager?
   end
@@ -30,6 +34,7 @@ class TaskPolicy < ApplicationPolicy
     create?
   end
 
+  # Update allowed if admin or creator
   def update?
     user.admin? || record.creator == user
   end
@@ -38,10 +43,12 @@ class TaskPolicy < ApplicationPolicy
     update?
   end
 
+  # Destroy allowed if admin or creator (member can delete tasks they assigned)
   def destroy?
     user.admin? || record.creator == user
   end
 
+  # Mark complete allowed if admin, creator, or assigned member
   def mark_complete?
     user.admin? || record.creator == user || record.assigned_to == user
   end
