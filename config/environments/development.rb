@@ -1,6 +1,21 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+
+   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+config.action_mailer.perform_deliveries = true
+
+config.action_mailer.delivery_method = :smtp
+
+  config.action_mailer.smtp_settings = {
+    address:              "smtp.gmail.com",
+    port:                 587,
+    domain:               "gmail.com",           # optional but helps
+    user_name:            "acharyasafal51@gmail.com", # full email e.g. you@gmail.com
+    password:             "bjkh bhig qrot ycud",
+    authentication:       "plain",
+    enable_starttls_auto: true
+}
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Make code changes take effect immediately without server restart.
@@ -14,12 +29,6 @@ Rails.application.configure do
 
   # Enable server timing.
   config.server_timing = true
-
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
-config.action_mailer.delivery_method = :letter_opener
-config.action_mailer.perform_deliveries = true
-config.action_mailer.raise_delivery_errors = true
-config.active_job.queue_adapter = :inline  # or :async if you have workers
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.
