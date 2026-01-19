@@ -1,0 +1,31 @@
+<div class="container mt-4">
+  <h2>All Tasks (Admin View)</h2>
+  <table class="table table-striped table-hover mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Assigned To</th>
+        <th>Due Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @tasks.each do |task| %>
+        <tr>
+          <td><%= task.title %></td>
+          <td>
+            <span class="badge bg-<%= task.completed? ? 'success' : 'warning' %>">
+              <%= task.status.capitalize %>
+            </span>
+          </td>
+          <td><%= task.assigned_to&.first_name || "N/A" %></td>
+          <td><%= l(task.due_date, format: :short) %></td>
+          <td>
+            <%= link_to "View", admin_task_path(task), class: "btn btn-sm btn-outline-primary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

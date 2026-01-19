@@ -1,0 +1,120 @@
+<h1>Admin – User Management</h1>
+
+<!-- Flash messages -->
+<% if flash[:notice] %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= flash[:notice] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>
+<% if flash[:alert] %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= flash[:alert] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>
+
+<!-- Search & Invite Section -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <!-- Search form -->
+    <%= form_with url: admin_users_path, method: :get, local: true, class: "d-flex" do |f| %>
+      <%= f.search_field :q, 
+                         value: params[:q],
+                         placeholder: "Search by name or email...",
+                         class: "form-control me-2" %>
+      <%= f.submit "Search", class: "btn btn-primary" %>
+      <% if params[:q].present? %>
+        <%= link_to "Clear", admin_users_path, class: "btn btn-outline-secondary ms-2" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="col-md-6 text-end">
+    <!-- Invite New Manager Button (opens modal or links to form) -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inviteManagerModal">
+      <i class="bi bi-person-plus"></i> Invite New Manager
+    </button>
+  </div>
+</div>
+
+<!-- Users Table -->
+<% if @users.any? %>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Joined</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.first_name %> <%= user.last_name %></td>
+          <td><%= user.email %></td>
+          <td>
+            <span class="badge <%= user.admin? ? 'bg-danger' : user.manager? ? 'bg-warning' : 'bg-secondary' %>">
+              <%= user.role.to_s.upcase %>
+            </span>
+          </td>
+          <td><%= user.created_at.strftime("%b %d, %Y") %></td>
+          <td>
+            <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-sm btn-outline-primary" %>
+            <%= button_to "Delete", admin_user_path(user), 
+                          method: :delete, 
+                          data: { confirm: "Are you sure you want to delete #{user.first_name}?" },
+                          class: "btn btn-sm btn-outline-danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <!-- Pagination (if using Kaminari) -->
+  <% if defined?(Kaminari) %>
+    <%= paginate @users %>
+  <% end %>
+
+<% else %>
+  <div class="alert alert-info">
+    <p>No users found yet.</p>
+  </div>
+<% end %>
+
+<!-- Modal for Inviting Manager -->
+<div class="modal fade" id="inviteManagerModal" tabindex="-1" aria-labelledby="inviteManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inviteManagerModalLabel">Invite New Manager</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <%= form_with url: invite_manager_admin_users_path, method: :post, local: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :first_name, class: "form-label" %>
+            <%= f.text_field :first_name, class: "form-control", required: true %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :last_name, class: "form-label" %>
+            <%= f.text_field :last_name, class: "form-control", required: true %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :email, class: "form-label" %>
+            <%= f.email_field :email, class: "form-control", required: true, autocomplete: "email" %>
+          </div>
+
+          <div class="d-grid">
+            <%= f.submit "Send Invitation", class: "btn btn-success" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

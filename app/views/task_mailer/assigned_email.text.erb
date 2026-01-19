@@ -1,0 +1,12 @@
+Hello <%= @task.assigned_to.first_name %>,
+
+You have been assigned a new task in Task Manager:
+
+Title: <%= @task.title %>
+Description: <%= @task.description %>
+Due Date: <%= @task.due_date.strftime("%B %d, %Y") %>
+
+View & update the task here: <%= task_url(@task) %>
+
+Thanks,
+Task Manager Team

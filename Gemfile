@@ -25,7 +25,10 @@ gem 'devise', '~> 4.9', '>= 4.9.4'
 # pundit
 gem 'pundit', '~> 2.5', '>= 2.5.2'
 
+# letter opener
+gem 'letter_opener', '~> 1.10'
 
+gem 'devise_invitable', '~> 2.0'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
