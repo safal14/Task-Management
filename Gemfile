@@ -21,7 +21,7 @@ gem "jbuilder"
 # postgres
 gem 'pg', '~> 1.6', '>= 1.6.2'
 # devise gem
-gem 'devise', '~> 4.9', '>= 4.9.4'
+gem 'devise', '~> 5.0'
 # pundit
 gem 'pundit', '~> 2.5', '>= 2.5.2'
 
